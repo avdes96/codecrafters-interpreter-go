@@ -35,6 +35,18 @@ func (s *Scanner) scanToken() {
 		s.addTokenOfType(token.LEFT_BRACE)
 	case '}':
 		s.addTokenOfType(token.RIGHT_BRACE)
+	case ',':
+		s.addTokenOfType(token.COMMA)
+	case '.':
+		s.addTokenOfType(token.DOT)
+	case '-':
+		s.addTokenOfType(token.MINUS)
+	case '+':
+		s.addTokenOfType(token.PLUS)
+	case '*':
+		s.addTokenOfType(token.STAR)
+	case ';':
+		s.addTokenOfType(token.SEMICOLON)
 	}
 }
 
