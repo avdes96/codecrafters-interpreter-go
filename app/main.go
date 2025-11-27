@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
+
+	"github.com/codecrafters-io/interpreter-starter-go/app/scanner"
 )
 
 func main() {
@@ -19,11 +21,18 @@ func main() {
 	}
 
 	filename := os.Args[2]
-	_, err := os.ReadFile(filename)
+	source, err := os.ReadFile(filename)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error reading file: %v\n", err)
 		os.Exit(1)
 	}
+	tokenize(string(source))
+}
 
-	fmt.Println("EOF  null")
+func tokenize(source string) {
+	s := scanner.NewScanner(source)
+	for _, t := range s.ScanTokens() {
+		fmt.Println(t)
+	}
+	fmt.Println()
 }
