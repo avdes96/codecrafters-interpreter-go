@@ -1,6 +1,11 @@
 package scanner
 
-import "github.com/codecrafters-io/interpreter-starter-go/app/token"
+import (
+	"fmt"
+
+	"github.com/codecrafters-io/interpreter-starter-go/app/errs"
+	"github.com/codecrafters-io/interpreter-starter-go/app/token"
+)
 
 type Scanner struct {
 	source  string
@@ -26,7 +31,7 @@ func (s *Scanner) ScanTokens() []token.Token {
 }
 
 func (s *Scanner) scanToken() {
-	switch s.advance() {
+	switch c := s.advance(); c {
 	case '(':
 		s.addTokenOfType(token.LEFT_PAREN)
 	case ')':
@@ -47,6 +52,8 @@ func (s *Scanner) scanToken() {
 		s.addTokenOfType(token.STAR)
 	case ';':
 		s.addTokenOfType(token.SEMICOLON)
+	default:
+		errs.Error(fmt.Sprintf("Unexpected character: %c", c))
 	}
 }
 

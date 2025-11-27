@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/codecrafters-io/interpreter-starter-go/app/errs"
 	"github.com/codecrafters-io/interpreter-starter-go/app/scanner"
 )
 
@@ -27,6 +28,9 @@ func main() {
 		os.Exit(1)
 	}
 	tokenize(string(source))
+	if errs.HadError {
+		os.Exit(65)
+	}
 }
 
 func tokenize(source string) {
