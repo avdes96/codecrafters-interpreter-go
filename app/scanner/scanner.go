@@ -31,6 +31,10 @@ func (s *Scanner) scanToken() {
 		s.addTokenOfType(token.LEFT_PAREN)
 	case ')':
 		s.addTokenOfType(token.RIGHT_PAREN)
+	case '{':
+		s.addTokenOfType(token.LEFT_BRACE)
+	case '}':
+		s.addTokenOfType(token.RIGHT_BRACE)
 	}
 }
 

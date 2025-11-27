@@ -10,12 +10,14 @@ func _() {
 	var x [1]struct{}
 	_ = x[LEFT_PAREN-0]
 	_ = x[RIGHT_PAREN-1]
-	_ = x[EOF-2]
+	_ = x[LEFT_BRACE-2]
+	_ = x[RIGHT_BRACE-3]
+	_ = x[EOF-4]
 }
 
-const _TokenType_name = "LEFT_PARENRIGHT_PARENEOF"
+const _TokenType_name = "LEFT_PARENRIGHT_PARENLEFT_BRACERIGHT_BRACEEOF"
 
-var _TokenType_index = [...]uint8{0, 10, 21, 24}
+var _TokenType_index = [...]uint8{0, 10, 21, 31, 42, 45}
 
 func (i TokenType) String() string {
 	idx := int(i) - 0

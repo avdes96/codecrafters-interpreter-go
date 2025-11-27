@@ -8,6 +8,8 @@ type TokenType int
 const (
 	LEFT_PAREN TokenType = iota
 	RIGHT_PAREN
+	LEFT_BRACE
+	RIGHT_BRACE
 	EOF
 )
 
