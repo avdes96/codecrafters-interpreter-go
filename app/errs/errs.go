@@ -7,7 +7,7 @@ import (
 
 var HadError = false
 
-func Error(message string) {
-	fmt.Fprintf(os.Stderr, "[line 1] Error: %s\n", message)
+func Error(line int, message string) {
+	fmt.Fprintf(os.Stderr, "[line %d] Error: %s\n", line, message)
 	HadError = true
 }

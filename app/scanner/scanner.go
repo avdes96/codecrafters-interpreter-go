@@ -12,12 +12,16 @@ type Scanner struct {
 	tokens  []token.Token
 	start   int
 	current int
+	line    int
 }
 
 func NewScanner(source string) *Scanner {
 	return &Scanner{
-		source: source,
-		tokens: []token.Token{},
+		source:  source,
+		tokens:  []token.Token{},
+		start:   0,
+		current: 0,
+		line:    1,
 	}
 }
 
@@ -82,10 +86,12 @@ func (s *Scanner) scanToken() {
 			break
 		}
 		s.addTokenOfType(token.SLASH)
-	case '\n', ' ', '\t', '\r':
+	case ' ', '\t', '\r':
 		// Ignore the whitespace
+	case '\n':
+		s.line++
 	default:
-		errs.Error(fmt.Sprintf("Unexpected character: %c", c))
+		errs.Error(s.line, fmt.Sprintf("Unexpected character: %c", c))
 	}
 }
 
