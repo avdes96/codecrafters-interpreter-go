@@ -64,6 +64,18 @@ func (s *Scanner) scanToken() {
 			break
 		}
 		s.addTokenOfType(token.BANG)
+	case '<':
+		if s.match('=') {
+			s.addTokenOfType(token.LESS_EQUAL)
+			break
+		}
+		s.addTokenOfType(token.LESS)
+	case '>':
+		if s.match('=') {
+			s.addTokenOfType(token.GREATER_EQUAL)
+			break
+		}
+		s.addTokenOfType(token.GREATER)
 	default:
 		errs.Error(fmt.Sprintf("Unexpected character: %c", c))
 	}
