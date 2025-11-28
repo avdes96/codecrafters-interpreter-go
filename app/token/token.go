@@ -16,6 +16,8 @@ const (
 	PLUS
 	STAR
 	SEMICOLON
+	EQUAL
+	EQUAL_EQUAL
 	EOF
 )
 

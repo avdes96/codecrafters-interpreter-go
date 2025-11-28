@@ -22,7 +22,7 @@ func NewScanner(source string) *Scanner {
 }
 
 func (s *Scanner) ScanTokens() []token.Token {
-	for s.current < len(s.source) {
+	for !s.atEnd() {
 		s.start = s.current
 		s.scanToken()
 	}
@@ -52,15 +52,33 @@ func (s *Scanner) scanToken() {
 		s.addTokenOfType(token.STAR)
 	case ';':
 		s.addTokenOfType(token.SEMICOLON)
+	case '=':
+		if s.match('=') {
+			s.addTokenOfType(token.EQUAL_EQUAL)
+			break
+		}
+		s.addTokenOfType(token.EQUAL)
 	default:
 		errs.Error(fmt.Sprintf("Unexpected character: %c", c))
 	}
+}
+
+func (s *Scanner) atEnd() bool {
+	return s.current >= len(s.source)
 }
 
 func (s *Scanner) advance() rune {
 	c := s.source[s.current]
 	s.current++
 	return rune(c)
+}
+
+func (s *Scanner) match(expected rune) bool {
+	if s.atEnd() || rune(s.source[s.current]) != expected {
+		return false
+	}
+	s.current++
+	return true
 }
 
 func (s *Scanner) addTokenOfType(tokenType token.TokenType) {

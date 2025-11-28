@@ -18,12 +18,14 @@ func _() {
 	_ = x[PLUS-7]
 	_ = x[STAR-8]
 	_ = x[SEMICOLON-9]
-	_ = x[EOF-10]
+	_ = x[EQUAL-10]
+	_ = x[EQUAL_EQUAL-11]
+	_ = x[EOF-12]
 }
 
-const _TokenType_name = "LEFT_PARENRIGHT_PARENLEFT_BRACERIGHT_BRACECOMMADOTMINUSPLUSSTARSEMICOLONEOF"
+const _TokenType_name = "LEFT_PARENRIGHT_PARENLEFT_BRACERIGHT_BRACECOMMADOTMINUSPLUSSTARSEMICOLONEQUALEQUAL_EQUALEOF"
 
-var _TokenType_index = [...]uint8{0, 10, 21, 31, 42, 47, 50, 55, 59, 63, 72, 75}
+var _TokenType_index = [...]uint8{0, 10, 21, 31, 42, 47, 50, 55, 59, 63, 72, 77, 88, 91}
 
 func (i TokenType) String() string {
 	idx := int(i) - 0
