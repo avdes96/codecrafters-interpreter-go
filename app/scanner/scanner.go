@@ -76,6 +76,14 @@ func (s *Scanner) scanToken() {
 			break
 		}
 		s.addTokenOfType(token.GREATER)
+	case '/':
+		if s.match('/') {
+			s.consumeLine()
+			break
+		}
+		s.addTokenOfType(token.SLASH)
+	case '\n':
+		s.current++
 	default:
 		errs.Error(fmt.Sprintf("Unexpected character: %c", c))
 	}
@@ -106,4 +114,17 @@ func (s *Scanner) addTokenOfType(tokenType token.TokenType) {
 func (s *Scanner) addToken(tokenType token.TokenType, literal any) {
 	lexeme := s.source[s.start:s.current]
 	s.tokens = append(s.tokens, token.NewToken(tokenType, lexeme, literal))
+}
+
+func (s *Scanner) consumeLine() {
+	for !s.atEnd() && s.peek() != '\n' {
+		s.current++
+	}
+}
+
+func (s *Scanner) peek() rune {
+	if s.atEnd() {
+		return 0
+	}
+	return rune(s.source[s.current])
 }
