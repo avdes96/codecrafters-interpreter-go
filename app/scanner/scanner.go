@@ -82,8 +82,8 @@ func (s *Scanner) scanToken() {
 			break
 		}
 		s.addTokenOfType(token.SLASH)
-	case '\n':
-		s.current++
+	case '\n', ' ', '\t', '\r':
+		// Ignore the whitespace
 	default:
 		errs.Error(fmt.Sprintf("Unexpected character: %c", c))
 	}
