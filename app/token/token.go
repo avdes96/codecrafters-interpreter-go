@@ -25,6 +25,7 @@ const (
 	GREATER
 	GREATER_EQUAL
 	SLASH
+	STRING
 	EOF
 )
 

@@ -90,6 +90,8 @@ func (s *Scanner) scanToken() {
 		// Ignore the whitespace
 	case '\n':
 		s.line++
+	case '"':
+		s.addString()
 	default:
 		errs.Error(s.line, fmt.Sprintf("Unexpected character: %c", c))
 	}
@@ -133,4 +135,16 @@ func (s *Scanner) peek() rune {
 		return 0
 	}
 	return rune(s.source[s.current])
+}
+
+func (s *Scanner) addString() {
+	for !s.atEnd() && s.peek() != '"' {
+		s.current++
+	}
+	if s.atEnd() {
+		errs.Error(s.line, "Unterminated string")
+		return
+	}
+	s.advance()
+	s.addToken(token.STRING, s.source[s.start+1:s.current-1])
 }
