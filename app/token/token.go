@@ -45,13 +45,13 @@ func NewToken(t TokenType, lexeme string, literal any) Token {
 
 func (t Token) String() string {
 	var literal string
-	switch t.Literal.(type) {
+	switch lit := t.Literal.(type) {
 	case nil:
 		literal = "null"
 	case int:
 		literal = "NUMBER"
 	case string:
-		literal = "STRING"
+		literal = string(lit)
 	}
 	return fmt.Sprintf("%s %s %s", t.Type, t.Lexeme, literal)
 }

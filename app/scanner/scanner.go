@@ -142,7 +142,7 @@ func (s *Scanner) addString() {
 		s.current++
 	}
 	if s.atEnd() {
-		errs.Error(s.line, "Unterminated string")
+		errs.Error(s.line, "Unterminated string.")
 		return
 	}
 	s.advance()
