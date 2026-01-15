@@ -2,6 +2,7 @@ package scanner
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/codecrafters-io/interpreter-starter-go/app/errs"
 	"github.com/codecrafters-io/interpreter-starter-go/app/token"
@@ -93,6 +94,10 @@ func (s *Scanner) scanToken() {
 	case '"':
 		s.addString()
 	default:
+		if isDigit(c) {
+			s.consumeNumber()
+			break
+		}
 		errs.Error(s.line, fmt.Sprintf("Unexpected character: %c", c))
 	}
 }
@@ -137,6 +142,13 @@ func (s *Scanner) peek() rune {
 	return rune(s.source[s.current])
 }
 
+func (s *Scanner) peekNext() rune {
+	if s.current+1 >= len(s.source) {
+		return 0
+	}
+	return rune(s.source[s.current+1])
+}
+
 func (s *Scanner) addString() {
 	for !s.atEnd() && s.peek() != '"' {
 		s.current++
@@ -147,4 +159,27 @@ func (s *Scanner) addString() {
 	}
 	s.advance()
 	s.addToken(token.STRING, s.source[s.start+1:s.current-1])
+}
+
+func isDigit(c rune) bool {
+	return c >= '0' && c <= '9'
+}
+
+func (s *Scanner) consumeNumber() {
+	for isDigit(s.peek()) {
+		s.advance()
+	}
+	if s.peek() == '.' && isDigit(s.peekNext()) {
+		s.advance()
+		for isDigit(s.peek()) {
+			s.advance()
+		}
+	}
+	numAsString := s.source[s.start:s.current]
+	literal, err := strconv.ParseFloat(numAsString, 64)
+	if err != nil {
+		errs.Error(s.line, fmt.Sprintf("Error parsing %s to number", numAsString))
+		return
+	}
+	s.addToken(token.NUMBER, literal)
 }

@@ -1,6 +1,10 @@
 package token
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+	"strings"
+)
 
 //go:generate stringer -type=TokenType
 type TokenType int
@@ -27,6 +31,7 @@ const (
 	SLASH
 	STRING
 	EOF
+	NUMBER
 )
 
 type Token struct {
@@ -48,8 +53,11 @@ func (t Token) String() string {
 	switch lit := t.Literal.(type) {
 	case nil:
 		literal = "null"
-	case int:
-		literal = "NUMBER"
+	case float64:
+		literal = strconv.FormatFloat(lit, 'f', -1, 64)
+		if !strings.ContainsRune(literal, '.') {
+			literal += ".0"
+		}
 	case string:
 		literal = string(lit)
 	}
