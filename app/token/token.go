@@ -33,6 +33,24 @@ const (
 	EOF
 	NUMBER
 	IDENTIFIER
+
+	// keywords
+	AND
+	CLASS
+	ELSE
+	FALSE
+	FOR
+	FUN
+	IF
+	NIL
+	OR
+	PRINT
+	RETURN
+	SUPER
+	THIS
+	TRUE
+	VAR
+	WHILE
 )
 
 type Token struct {

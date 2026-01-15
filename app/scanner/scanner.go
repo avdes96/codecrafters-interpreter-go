@@ -16,6 +16,25 @@ type Scanner struct {
 	line    int
 }
 
+var keywords = map[string]token.TokenType{
+	"and":    token.AND,
+	"class":  token.CLASS,
+	"else":   token.ELSE,
+	"false":  token.FALSE,
+	"for":    token.FOR,
+	"fun":    token.FUN,
+	"if":     token.IF,
+	"nil":    token.NIL,
+	"or":     token.OR,
+	"print":  token.PRINT,
+	"return": token.RETURN,
+	"super":  token.SUPER,
+	"this":   token.THIS,
+	"true":   token.TRUE,
+	"var":    token.VAR,
+	"while":  token.WHILE,
+}
+
 func NewScanner(source string) *Scanner {
 	return &Scanner{
 		source:  source,
@@ -198,5 +217,9 @@ func (s *Scanner) consumeIdentifier() {
 	for isAlphaNumeric(s.peek()) {
 		s.advance()
 	}
-	s.addTokenOfType(token.IDENTIFIER)
+	tokenType, ok := keywords[s.source[s.start:s.current]]
+	if !ok {
+		tokenType = token.IDENTIFIER
+	}
+	s.addTokenOfType(tokenType)
 }
