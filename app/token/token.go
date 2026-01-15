@@ -32,6 +32,7 @@ const (
 	STRING
 	EOF
 	NUMBER
+	IDENTIFIER
 )
 
 type Token struct {
