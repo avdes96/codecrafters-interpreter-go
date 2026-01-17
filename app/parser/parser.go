@@ -18,7 +18,7 @@ func NewParser(tokens []token.Token) *Parser {
 }
 
 func (p *Parser) Parse() ast.Expr {
-	if p.match(token.NUMBER) {
+	if p.match(token.NUMBER, token.STRING) {
 		return ast.NewLiteral(p.previous().Literal)
 	} else if p.match(token.TRUE) {
 		return ast.NewLiteral(true)
