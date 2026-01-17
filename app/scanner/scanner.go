@@ -2,6 +2,7 @@ package scanner
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 
 	"github.com/codecrafters-io/interpreter-starter-go/app/errs"
@@ -207,8 +208,8 @@ func (s *Scanner) consumeNumber() {
 	numAsString := s.source[s.start:s.current]
 	literal, err := strconv.ParseFloat(numAsString, 64)
 	if err != nil {
-		errs.Error(s.line, fmt.Sprintf("Error parsing %s to number", numAsString))
-		return
+		fmt.Fprintf(os.Stderr, "Error parsing %s to number: %v\n", numAsString, err)
+		os.Exit(1)
 	}
 	s.addToken(token.NUMBER, literal)
 }
