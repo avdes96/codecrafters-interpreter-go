@@ -18,7 +18,9 @@ func NewParser(tokens []token.Token) *Parser {
 }
 
 func (p *Parser) Parse() ast.Expr {
-	if p.match(token.TRUE) {
+	if p.match(token.NUMBER) {
+		return ast.NewLiteral(p.previous().Literal)
+	} else if p.match(token.TRUE) {
 		return ast.NewLiteral(true)
 	} else if p.match(token.FALSE) {
 		return ast.NewLiteral(false)
@@ -44,9 +46,8 @@ func (p *Parser) check(tokenType token.TokenType) bool {
 }
 
 func (p *Parser) advance() token.Token {
-	tmp := p.tokens[p.current]
 	p.current++
-	return tmp
+	return p.previous()
 }
 
 func (p *Parser) peek() token.TokenType {
@@ -58,4 +59,8 @@ func (p *Parser) peek() token.TokenType {
 
 func (p *Parser) isAtEnd() bool {
 	return p.peek() == token.EOF
+}
+
+func (p *Parser) previous() token.Token {
+	return p.tokens[p.current-1]
 }
