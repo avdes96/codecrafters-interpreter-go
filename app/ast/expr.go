@@ -1,6 +1,8 @@
 package ast
 
 import (
+	"fmt"
+	"os"
 	"strconv"
 	"strings"
 
@@ -49,21 +51,24 @@ func NewLiteral(value any) *Literal {
 }
 
 func (l *Literal) String() string {
+	var str string
 	switch v := l.value.(type) {
 	case nil:
-		return "nil"
+		str = "nil"
 	case bool:
-		return strconv.FormatBool(v)
+		str = strconv.FormatBool(v)
 	case float64:
-		s := strconv.FormatFloat(v, 'f', -1, 64)
-		if !strings.ContainsRune(s, '.') {
-			s += ".0"
+		str = strconv.FormatFloat(v, 'f', -1, 64)
+		if !strings.ContainsRune(str, '.') {
+			str += ".0"
 		}
-		return s
 	case string:
-		return v
+		str = v
+	default:
+		fmt.Fprintf(os.Stderr, "Unsupported literal type %T\n", v)
+		os.Exit(1)
 	}
-	return ""
+	return str
 }
 
 func (l *Literal) exprNode() {}
