@@ -51,7 +51,9 @@ func NewLiteral(value any) *Literal {
 func (l *Literal) String() string {
 	switch v := l.value.(type) {
 	case nil:
-		return "null"
+		return "nil"
+	case bool:
+		return strconv.FormatBool(v)
 	case float64:
 		s := strconv.FormatFloat(v, 'f', -1, 64)
 		if !strings.ContainsRune(s, '.') {

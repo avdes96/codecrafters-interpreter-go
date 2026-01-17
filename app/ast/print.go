@@ -18,11 +18,7 @@ func construct(expr Expr, sb *strings.Builder) {
 	case *Unary:
 		parenthesise(sb, e.operator.Lexeme, e.right)
 	case *Literal:
-		if e.value == nil {
-			sb.WriteString("null")
-		} else {
-			sb.WriteString(e.String())
-		}
+		sb.WriteString(e.String())
 	case *Grouping:
 		parenthesise(sb, "grouping", e.expression)
 	}
