@@ -18,8 +18,19 @@ func NewParser(tokens []token.Token) *Parser {
 }
 
 func (p *Parser) Parse() ast.Expr {
-	return p.unary()
+	return p.factor()
 }
+
+func (p *Parser) factor() ast.Expr {
+	expr := p.unary()
+	for p.match(token.SLASH, token.STAR) {
+		operator := p.previous()
+		right := p.unary()
+		expr = ast.NewBinary(expr, operator, right)
+	}
+	return expr
+}
+
 func (p *Parser) unary() ast.Expr {
 	if p.match(token.BANG, token.MINUS) {
 		operator := p.previous()

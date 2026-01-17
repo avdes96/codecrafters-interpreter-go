@@ -18,7 +18,7 @@ type Binary struct {
 	operator    token.Token
 }
 
-func NewBinary(left, right Expr, operator token.Token) *Binary {
+func NewBinary(left Expr, operator token.Token, right Expr) *Binary {
 	return &Binary{
 		left:     left,
 		right:    right,
