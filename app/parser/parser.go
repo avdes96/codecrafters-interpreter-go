@@ -18,7 +18,21 @@ func NewParser(tokens []token.Token) *Parser {
 }
 
 func (p *Parser) Parse() ast.Expr {
-	return p.comparsion()
+	return p.expression()
+}
+
+func (p *Parser) expression() ast.Expr {
+	return p.equality()
+}
+
+func (p *Parser) equality() ast.Expr {
+	expr := p.comparsion()
+	for p.match(token.BANG_EQUAL, token.EQUAL_EQUAL) {
+		operator := p.previous()
+		right := p.term()
+		expr = ast.NewBinary(expr, operator, right)
+	}
+	return expr
 }
 func (p *Parser) comparsion() ast.Expr {
 	expr := p.term()
