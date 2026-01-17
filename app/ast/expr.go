@@ -33,10 +33,10 @@ type Unary struct {
 	right    Expr
 }
 
-func NewUnary(right Expr, operator token.Token) *Unary {
+func NewUnary(operator token.Token, right Expr) *Unary {
 	return &Unary{
-		right:    right,
 		operator: operator,
+		right:    right,
 	}
 }
 

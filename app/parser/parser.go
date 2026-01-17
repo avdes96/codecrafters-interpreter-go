@@ -18,6 +18,17 @@ func NewParser(tokens []token.Token) *Parser {
 }
 
 func (p *Parser) Parse() ast.Expr {
+	return p.unary()
+}
+func (p *Parser) unary() ast.Expr {
+	if p.match(token.BANG, token.MINUS) {
+		operator := p.previous()
+		right := p.unary()
+		return ast.NewUnary(operator, right)
+	}
+	return p.primary()
+}
+func (p *Parser) primary() ast.Expr {
 	if p.match(token.NUMBER, token.STRING) {
 		return ast.NewLiteral(p.previous().Literal)
 	} else if p.match(token.TRUE) {

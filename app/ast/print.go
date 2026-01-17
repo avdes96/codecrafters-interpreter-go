@@ -20,7 +20,7 @@ func construct(expr Expr, sb *strings.Builder) {
 	case *Literal:
 		sb.WriteString(e.String())
 	case *Grouping:
-		parenthesise(sb, "group ", e.expression)
+		parenthesise(sb, "group", e.expression)
 	}
 }
 
@@ -28,6 +28,7 @@ func parenthesise(sb *strings.Builder, name string, exprs ...Expr) {
 	sb.WriteString("(")
 	sb.WriteString(name)
 	for _, expr := range exprs {
+		sb.WriteString(" ")
 		construct(expr, sb)
 	}
 	sb.WriteString(")")
