@@ -24,6 +24,9 @@ func (p *Parser) Parse() ast.Expr {
 		return ast.NewLiteral(true)
 	} else if p.match(token.FALSE) {
 		return ast.NewLiteral(false)
+	} else if p.match(token.LEFT_PAREN) {
+		expr := p.Parse()
+		return ast.NewGrouping(&expr)
 	}
 	return ast.NewLiteral(nil)
 }
