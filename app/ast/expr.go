@@ -16,6 +16,14 @@ type Binary struct {
 	operator    token.Token
 }
 
+func NewBinary(left, right Expr, operator token.Token) *Binary {
+	return &Binary{
+		left:     left,
+		right:    right,
+		operator: operator,
+	}
+}
+
 func (b *Binary) exprNode() {}
 
 type Unary struct {
@@ -23,10 +31,21 @@ type Unary struct {
 	right    Expr
 }
 
+func NewUnary(right Expr, operator token.Token) *Unary {
+	return &Unary{
+		right:    right,
+		operator: operator,
+	}
+}
+
 func (u *Unary) exprNode() {}
 
 type Literal struct {
 	value any
+}
+
+func NewLiteral(value any) *Literal {
+	return &Literal{value: value}
 }
 
 func (l *Literal) String() string {
@@ -52,3 +71,7 @@ type Grouping struct {
 }
 
 func (g *Grouping) exprNode() {}
+
+func NewGrouping(expression *Expr) *Grouping {
+	return &Grouping{expression: *expression}
+}
