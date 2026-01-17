@@ -18,7 +18,17 @@ func NewParser(tokens []token.Token) *Parser {
 }
 
 func (p *Parser) Parse() ast.Expr {
-	return p.factor()
+	return p.term()
+}
+
+func (p *Parser) term() ast.Expr {
+	expr := p.factor()
+	for p.match(token.MINUS, token.PLUS) {
+		operator := p.previous()
+		right := p.factor()
+		expr = ast.NewBinary(expr, operator, right)
+	}
+	return expr
 }
 
 func (p *Parser) factor() ast.Expr {
@@ -48,6 +58,7 @@ func (p *Parser) primary() ast.Expr {
 		return ast.NewLiteral(false)
 	} else if p.match(token.LEFT_PAREN) {
 		expr := p.Parse()
+		p.advance() // Assume correct right paren for now
 		return ast.NewGrouping(&expr)
 	}
 	return ast.NewLiteral(nil)
