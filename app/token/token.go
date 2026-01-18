@@ -59,8 +59,8 @@ type Token struct {
 	Literal any
 }
 
-func NewToken(t TokenType, lexeme string, literal any) Token {
-	return Token{
+func NewToken(t TokenType, lexeme string, literal any) *Token {
+	return &Token{
 		Type:    t,
 		Lexeme:  lexeme,
 		Literal: literal,

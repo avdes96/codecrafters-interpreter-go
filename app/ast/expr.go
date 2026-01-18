@@ -15,10 +15,10 @@ type Expr interface {
 
 type Binary struct {
 	left, right Expr
-	operator    token.Token
+	operator    *token.Token
 }
 
-func NewBinary(left Expr, operator token.Token, right Expr) *Binary {
+func NewBinary(left Expr, operator *token.Token, right Expr) *Binary {
 	return &Binary{
 		left:     left,
 		right:    right,
@@ -29,11 +29,11 @@ func NewBinary(left Expr, operator token.Token, right Expr) *Binary {
 func (b *Binary) exprNode() {}
 
 type Unary struct {
-	operator token.Token
+	operator *token.Token
 	right    Expr
 }
 
-func NewUnary(operator token.Token, right Expr) *Unary {
+func NewUnary(operator *token.Token, right Expr) *Unary {
 	return &Unary{
 		operator: operator,
 		right:    right,
@@ -79,6 +79,6 @@ type Grouping struct {
 
 func (g *Grouping) exprNode() {}
 
-func NewGrouping(expression *Expr) *Grouping {
-	return &Grouping{expression: *expression}
+func NewGrouping(expression Expr) *Grouping {
+	return &Grouping{expression: expression}
 }

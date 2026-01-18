@@ -11,7 +11,7 @@ import (
 
 type Scanner struct {
 	source  string
-	tokens  []token.Token
+	tokens  []*token.Token
 	start   int
 	current int
 	line    int
@@ -39,14 +39,14 @@ var keywords = map[string]token.TokenType{
 func NewScanner(source string) *Scanner {
 	return &Scanner{
 		source:  source,
-		tokens:  []token.Token{},
+		tokens:  []*token.Token{},
 		start:   0,
 		current: 0,
 		line:    1,
 	}
 }
 
-func (s *Scanner) ScanTokens() []token.Token {
+func (s *Scanner) ScanTokens() []*token.Token {
 	for !s.atEnd() {
 		s.start = s.current
 		s.scanToken()

@@ -6,11 +6,11 @@ import (
 )
 
 type Parser struct {
-	tokens  []token.Token
+	tokens  []*token.Token
 	current int
 }
 
-func NewParser(tokens []token.Token) *Parser {
+func NewParser(tokens []*token.Token) *Parser {
 	return &Parser{
 		tokens:  tokens,
 		current: 0,
@@ -82,7 +82,7 @@ func (p *Parser) primary() ast.Expr {
 	} else if p.match(token.LEFT_PAREN) {
 		expr := p.Parse()
 		p.advance() // Assume correct right paren for now
-		return ast.NewGrouping(&expr)
+		return ast.NewGrouping(expr)
 	}
 	return ast.NewLiteral(nil)
 }
@@ -104,7 +104,7 @@ func (p *Parser) check(tokenType token.TokenType) bool {
 	return p.peek() == tokenType
 }
 
-func (p *Parser) advance() token.Token {
+func (p *Parser) advance() *token.Token {
 	p.current++
 	return p.previous()
 }
@@ -120,6 +120,6 @@ func (p *Parser) isAtEnd() bool {
 	return p.peek() == token.EOF
 }
 
-func (p *Parser) previous() token.Token {
+func (p *Parser) previous() *token.Token {
 	return p.tokens[p.current-1]
 }
