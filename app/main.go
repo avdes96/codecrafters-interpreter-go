@@ -76,9 +76,10 @@ func interpret(source string) {
 func stringify(val any) string {
 	if val == nil {
 		return "nil"
-	}
-	if v, ok := val.(bool); ok {
+	} else if v, ok := val.(bool); ok {
 		return strconv.FormatBool(v)
+	} else if v, ok := val.(float64); ok {
+		return strconv.FormatFloat(v, 'f', -1, 64)
 	}
-	return ""
+	return val.(string)
 }
