@@ -51,5 +51,8 @@ func parse(source string) {
 	tokens := s.ScanTokens()
 	p := parser.NewParser(tokens)
 	expr := p.Parse()
+	if errs.HadError {
+		os.Exit(65)
+	}
 	ast.Print(expr)
 }

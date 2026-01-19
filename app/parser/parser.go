@@ -2,6 +2,7 @@ package parser
 
 import (
 	"github.com/codecrafters-io/interpreter-starter-go/app/ast"
+	"github.com/codecrafters-io/interpreter-starter-go/app/errs"
 	"github.com/codecrafters-io/interpreter-starter-go/app/token"
 )
 
@@ -17,74 +18,121 @@ func NewParser(tokens []*token.Token) *Parser {
 	}
 }
 
-func (p *Parser) Parse() ast.Expr {
-	return p.expression()
+type ParseError struct{}
+
+func NewParseError(t *token.Token, message string) *ParseError {
+	errs.ErrorAtToken(t, message)
+	return &ParseError{}
 }
 
-func (p *Parser) expression() ast.Expr {
+func (p *Parser) Parse() ast.Expr {
+	expr, parseErr := p.expression()
+	if parseErr != nil {
+		return nil
+	}
+	return expr
+}
+
+func (p *Parser) expression() (ast.Expr, *ParseError) {
 	return p.equality()
 }
 
-func (p *Parser) equality() ast.Expr {
-	expr := p.comparsion()
+func (p *Parser) equality() (ast.Expr, *ParseError) {
+	expr, parseErr := p.comparsion()
+	if parseErr != nil {
+		return nil, parseErr
+	}
 	for p.match(token.BANG_EQUAL, token.EQUAL_EQUAL) {
 		operator := p.previous()
-		right := p.term()
+		right, parseErr := p.term()
+		if parseErr != nil {
+			return nil, parseErr
+		}
 		expr = ast.NewBinary(expr, operator, right)
 	}
-	return expr
+	return expr, nil
 }
-func (p *Parser) comparsion() ast.Expr {
-	expr := p.term()
+func (p *Parser) comparsion() (ast.Expr, *ParseError) {
+	expr, parseErr := p.term()
+	if parseErr != nil {
+		return nil, parseErr
+	}
 	for p.match(token.GREATER, token.GREATER_EQUAL, token.LESS, token.LESS_EQUAL) {
 		operator := p.previous()
-		right := p.term()
+		right, parseErr := p.term()
+		if parseErr != nil {
+			return nil, parseErr
+		}
 		expr = ast.NewBinary(expr, operator, right)
 	}
-	return expr
+	return expr, nil
 }
 
-func (p *Parser) term() ast.Expr {
-	expr := p.factor()
+func (p *Parser) term() (ast.Expr, *ParseError) {
+	expr, parseErr := p.factor()
+	if parseErr != nil {
+		return nil, parseErr
+	}
 	for p.match(token.MINUS, token.PLUS) {
 		operator := p.previous()
-		right := p.factor()
+		right, parseErr := p.factor()
+		if parseErr != nil {
+			return nil, parseErr
+		}
 		expr = ast.NewBinary(expr, operator, right)
 	}
-	return expr
+	return expr, nil
 }
 
-func (p *Parser) factor() ast.Expr {
-	expr := p.unary()
+func (p *Parser) factor() (ast.Expr, *ParseError) {
+	expr, parseErr := p.unary()
+	if parseErr != nil {
+		return nil, parseErr
+	}
 	for p.match(token.SLASH, token.STAR) {
 		operator := p.previous()
-		right := p.unary()
+		right, parseErr := p.unary()
+		if parseErr != nil {
+			return nil, parseErr
+		}
 		expr = ast.NewBinary(expr, operator, right)
 	}
-	return expr
+	return expr, nil
 }
 
-func (p *Parser) unary() ast.Expr {
+func (p *Parser) unary() (ast.Expr, *ParseError) {
 	if p.match(token.BANG, token.MINUS) {
 		operator := p.previous()
-		right := p.unary()
-		return ast.NewUnary(operator, right)
+		right, parseErr := p.unary()
+		if parseErr != nil {
+			return nil, parseErr
+		}
+		return ast.NewUnary(operator, right), nil
 	}
 	return p.primary()
 }
-func (p *Parser) primary() ast.Expr {
+func (p *Parser) primary() (ast.Expr, *ParseError) {
 	if p.match(token.NUMBER, token.STRING) {
-		return ast.NewLiteral(p.previous().Literal)
+		return ast.NewLiteral(p.previous().Literal), nil
 	} else if p.match(token.TRUE) {
-		return ast.NewLiteral(true)
+		return ast.NewLiteral(true), nil
 	} else if p.match(token.FALSE) {
-		return ast.NewLiteral(false)
+		return ast.NewLiteral(false), nil
+	} else if p.match(token.NIL) {
+		return ast.NewLiteral(nil), nil
 	} else if p.match(token.LEFT_PAREN) {
-		expr := p.Parse()
-		p.advance() // Assume correct right paren for now
-		return ast.NewGrouping(expr)
+		expr, parseErr := p.expression()
+		if parseErr != nil {
+			return nil, parseErr
+		}
+
+		_, parseErr = p.consume(token.RIGHT_PAREN, "Expect ')' after expression.")
+		if parseErr != nil {
+			return nil, parseErr
+		}
+		return ast.NewGrouping(expr), nil
 	}
-	return ast.NewLiteral(nil)
+	return nil, NewParseError(p.peek(), "Expect expression.")
 }
 
 func (p *Parser) match(tokenTypes ...token.TokenType) bool {
@@ -101,7 +149,7 @@ func (p *Parser) check(tokenType token.TokenType) bool {
 	if p.isAtEnd() {
 		return false
 	}
-	return p.peek() == tokenType
+	return p.peek().Type == tokenType
 }
 
 func (p *Parser) advance() *token.Token {
@@ -109,17 +157,24 @@ func (p *Parser) advance() *token.Token {
 	return p.previous()
 }
 
-func (p *Parser) peek() token.TokenType {
+func (p *Parser) peek() *token.Token {
 	if p.current >= len(p.tokens) {
-		return -1
+		return nil
 	}
-	return p.tokens[p.current].Type
+	return p.tokens[p.current]
 }
 
 func (p *Parser) isAtEnd() bool {
-	return p.peek() == token.EOF
+	return p.peek().Type == token.EOF
 }
 
 func (p *Parser) previous() *token.Token {
 	return p.tokens[p.current-1]
+}
+
+func (p *Parser) consume(tokenType token.TokenType, message string) (*token.Token, *ParseError) {
+	if p.check(tokenType) {
+		return p.advance(), nil
+	}
+	return nil, NewParseError(p.peek(), message)
 }

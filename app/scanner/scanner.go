@@ -51,7 +51,7 @@ func (s *Scanner) ScanTokens() []*token.Token {
 		s.start = s.current
 		s.scanToken()
 	}
-	s.tokens = append(s.tokens, token.NewToken(token.EOF, "", nil))
+	s.tokens = append(s.tokens, token.NewToken(token.EOF, "", nil, s.line))
 	return s.tokens
 }
 
@@ -119,7 +119,7 @@ func (s *Scanner) scanToken() {
 		} else if isAlpha(c) {
 			s.consumeIdentifier()
 		} else {
-			errs.Error(s.line, fmt.Sprintf("Unexpected character: %c", c))
+			errs.ErrorOnLine(s.line, fmt.Sprintf("Unexpected character: %c", c))
 		}
 	}
 }
@@ -148,7 +148,7 @@ func (s *Scanner) addTokenOfType(tokenType token.TokenType) {
 
 func (s *Scanner) addToken(tokenType token.TokenType, literal any) {
 	lexeme := s.source[s.start:s.current]
-	s.tokens = append(s.tokens, token.NewToken(tokenType, lexeme, literal))
+	s.tokens = append(s.tokens, token.NewToken(tokenType, lexeme, literal, s.line))
 }
 
 func (s *Scanner) consumeLine() {
@@ -176,7 +176,7 @@ func (s *Scanner) addString() {
 		s.current++
 	}
 	if s.atEnd() {
-		errs.Error(s.line, "Unterminated string.")
+		errs.ErrorOnLine(s.line, "Unterminated string.")
 		return
 	}
 	s.advance()
