@@ -74,11 +74,11 @@ func (l *Literal) String() string {
 func (l *Literal) exprNode() {}
 
 type Grouping struct {
-	expression Expr
+	Expression Expr
 }
 
 func (g *Grouping) exprNode() {}
 
 func NewGrouping(expression Expr) *Grouping {
-	return &Grouping{expression: expression}
+	return &Grouping{Expression: expression}
 }

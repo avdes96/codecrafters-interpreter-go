@@ -20,7 +20,7 @@ func construct(expr Expr, sb *strings.Builder) {
 	case *Literal:
 		sb.WriteString(e.String())
 	case *Grouping:
-		parenthesise(sb, "group", e.expression)
+		parenthesise(sb, "group", e.Expression)
 	}
 }
 
