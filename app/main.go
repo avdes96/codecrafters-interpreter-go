@@ -6,6 +6,7 @@ import (
 
 	"github.com/codecrafters-io/interpreter-starter-go/app/ast"
 	"github.com/codecrafters-io/interpreter-starter-go/app/errs"
+	"github.com/codecrafters-io/interpreter-starter-go/app/interpreter"
 	"github.com/codecrafters-io/interpreter-starter-go/app/parser"
 	"github.com/codecrafters-io/interpreter-starter-go/app/scanner"
 )
@@ -32,6 +33,8 @@ func main() {
 		}
 	case "parse":
 		parse(string(source))
+	case "evaluate":
+		interpret(string(source))
 	default:
 		fmt.Fprintf(os.Stderr, "Unknown command: %s\n", command)
 		os.Exit(1)
@@ -55,4 +58,16 @@ func parse(source string) {
 		os.Exit(65)
 	}
 	ast.Print(expr)
+}
+
+func interpret(source string) {
+	s := scanner.NewScanner(source)
+	tokens := s.ScanTokens()
+	p := parser.NewParser(tokens)
+	expr := p.Parse()
+	if errs.HadError {
+		os.Exit(65)
+	}
+	i := interpreter.NewInterpreter()
+	i.Interpret(expr)
 }
