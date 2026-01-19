@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/codecrafters-io/interpreter-starter-go/app/ast"
 	"github.com/codecrafters-io/interpreter-starter-go/app/errs"
@@ -69,5 +70,15 @@ func interpret(source string) {
 		os.Exit(65)
 	}
 	i := interpreter.NewInterpreter()
-	i.Interpret(expr)
+	fmt.Println(stringify(i.Interpret(expr)))
+}
+
+func stringify(val any) string {
+	if val == nil {
+		return "nil"
+	}
+	if v, ok := val.(bool); ok {
+		return strconv.FormatBool(v)
+	}
+	return ""
 }

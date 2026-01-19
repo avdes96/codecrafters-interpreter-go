@@ -43,16 +43,16 @@ func NewUnary(operator *token.Token, right Expr) *Unary {
 func (u *Unary) exprNode() {}
 
 type Literal struct {
-	value any
+	Value any
 }
 
 func NewLiteral(value any) *Literal {
-	return &Literal{value: value}
+	return &Literal{Value: value}
 }
 
 func (l *Literal) String() string {
 	var str string
-	switch v := l.value.(type) {
+	switch v := l.Value.(type) {
 	case nil:
 		str = "nil"
 	case bool:
