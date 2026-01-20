@@ -29,14 +29,14 @@ func NewBinary(left Expr, operator *token.Token, right Expr) *Binary {
 func (b *Binary) exprNode() {}
 
 type Unary struct {
-	operator *token.Token
-	right    Expr
+	Operator *token.Token
+	Right    Expr
 }
 
 func NewUnary(operator *token.Token, right Expr) *Unary {
 	return &Unary{
-		operator: operator,
-		right:    right,
+		Operator: operator,
+		Right:    right,
 	}
 }
 

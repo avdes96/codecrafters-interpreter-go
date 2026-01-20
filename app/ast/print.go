@@ -16,7 +16,7 @@ func construct(expr Expr, sb *strings.Builder) {
 	case *Binary:
 		parenthesise(sb, e.operator.Lexeme, e.left, e.right)
 	case *Unary:
-		parenthesise(sb, e.operator.Lexeme, e.right)
+		parenthesise(sb, e.Operator.Lexeme, e.Right)
 	case *Literal:
 		sb.WriteString(e.String())
 	case *Grouping:
