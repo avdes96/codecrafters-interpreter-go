@@ -14,7 +14,7 @@ func Print(expr Expr) {
 func construct(expr Expr, sb *strings.Builder) {
 	switch e := expr.(type) {
 	case *Binary:
-		parenthesise(sb, e.operator.Lexeme, e.left, e.right)
+		parenthesise(sb, e.Operator.Lexeme, e.Left, e.Right)
 	case *Unary:
 		parenthesise(sb, e.Operator.Lexeme, e.Right)
 	case *Literal:

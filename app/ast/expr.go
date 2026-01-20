@@ -14,15 +14,15 @@ type Expr interface {
 }
 
 type Binary struct {
-	left, right Expr
-	operator    *token.Token
+	Left, Right Expr
+	Operator    *token.Token
 }
 
 func NewBinary(left Expr, operator *token.Token, right Expr) *Binary {
 	return &Binary{
-		left:     left,
-		right:    right,
-		operator: operator,
+		Left:     left,
+		Right:    right,
+		Operator: operator,
 	}
 }
 
