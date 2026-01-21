@@ -7,7 +7,10 @@ import (
 	"github.com/codecrafters-io/interpreter-starter-go/app/token"
 )
 
-var HadError = false
+var (
+	HadError        = false
+	HadRuntimeError = false
+)
 
 func ErrorOnLine(line int, message string) {
 	report(line, "", message)
@@ -24,4 +27,9 @@ func ErrorAtToken(t *token.Token, message string) {
 func report(line int, where string, message string) {
 	fmt.Fprintf(os.Stderr, "[line %d] Error%s: %s\n", line, where, message)
 	HadError = true
+}
+
+func RuntimeError(line int, message string) {
+	fmt.Fprintf(os.Stderr, "%s\n[line %d] ", message, line)
+	HadRuntimeError = true
 }

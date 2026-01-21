@@ -70,7 +70,11 @@ func interpret(source string) {
 		os.Exit(65)
 	}
 	i := interpreter.NewInterpreter()
-	fmt.Println(stringify(i.Interpret(expr)))
+	eval := i.Interpret(expr)
+	if errs.HadRuntimeError {
+		os.Exit(70)
+	}
+	fmt.Println(stringify(eval))
 }
 
 func stringify(val any) string {
