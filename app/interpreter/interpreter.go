@@ -7,6 +7,7 @@ import (
 	"github.com/codecrafters-io/interpreter-starter-go/app/ast"
 	"github.com/codecrafters-io/interpreter-starter-go/app/errs"
 	"github.com/codecrafters-io/interpreter-starter-go/app/token"
+	"github.com/codecrafters-io/interpreter-starter-go/app/utils"
 )
 
 type Interpreter struct{}
@@ -32,7 +33,24 @@ var numberOnlyOperators = map[token.TokenType]struct{}{
 	token.LESS_EQUAL:    {},
 }
 
-func (i *Interpreter) Interpret(expression ast.Expr) any {
+func (i *Interpreter) Interpret(statements []ast.Stmt) {
+	for _, statement := range statements {
+		i.execute(statement)
+	}
+}
+
+func (i *Interpreter) execute(statement ast.Stmt) {
+	switch s := statement.(type) {
+	case *ast.PrintStmt:
+		eval, runtimeErr := i.evaluate(s.Expression)
+		if runtimeErr != nil {
+			return
+		}
+		fmt.Println(utils.Stringify(eval))
+	}
+}
+
+func (i *Interpreter) Evaluate(expression ast.Expr) any {
 	eval, runtimeErr := i.evaluate(expression)
 	if runtimeErr != nil {
 		return nil

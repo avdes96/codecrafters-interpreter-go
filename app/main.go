@@ -3,13 +3,13 @@ package main
 import (
 	"fmt"
 	"os"
-	"strconv"
 
 	"github.com/codecrafters-io/interpreter-starter-go/app/ast"
 	"github.com/codecrafters-io/interpreter-starter-go/app/errs"
 	"github.com/codecrafters-io/interpreter-starter-go/app/interpreter"
 	"github.com/codecrafters-io/interpreter-starter-go/app/parser"
 	"github.com/codecrafters-io/interpreter-starter-go/app/scanner"
+	"github.com/codecrafters-io/interpreter-starter-go/app/utils"
 )
 
 func main() {
@@ -35,7 +35,9 @@ func main() {
 	case "parse":
 		parse(string(source))
 	case "evaluate":
-		interpret(string(source))
+		evaluate(string(source))
+	case "run":
+		run(string(source))
 	default:
 		fmt.Fprintf(os.Stderr, "Unknown command: %s\n", command)
 		os.Exit(1)
@@ -54,36 +56,40 @@ func parse(source string) {
 	s := scanner.NewScanner(source)
 	tokens := s.ScanTokens()
 	p := parser.NewParser(tokens)
-	expr := p.Parse()
+	expr := p.ParseExpression()
 	if errs.HadError {
 		os.Exit(65)
 	}
 	ast.Print(expr)
 }
 
-func interpret(source string) {
+func evaluate(source string) {
 	s := scanner.NewScanner(source)
 	tokens := s.ScanTokens()
 	p := parser.NewParser(tokens)
-	expr := p.Parse()
+	expr := p.ParseExpression()
 	if errs.HadError {
 		os.Exit(65)
 	}
 	i := interpreter.NewInterpreter()
-	eval := i.Interpret(expr)
+	eval := i.Evaluate(expr)
 	if errs.HadRuntimeError {
 		os.Exit(70)
 	}
-	fmt.Println(stringify(eval))
+	fmt.Println(utils.Stringify(eval))
 }
 
-func stringify(val any) string {
-	if val == nil {
-		return "nil"
-	} else if v, ok := val.(bool); ok {
-		return strconv.FormatBool(v)
-	} else if v, ok := val.(float64); ok {
-		return strconv.FormatFloat(v, 'f', -1, 64)
+func run(source string) {
+	s := scanner.NewScanner(source)
+	tokens := s.ScanTokens()
+	p := parser.NewParser(tokens)
+	statements := p.ParseProgram()
+	if errs.HadError {
+		os.Exit(65)
 	}
-	return val.(string)
+	i := interpreter.NewInterpreter()
+	i.Interpret(statements)
+	if errs.HadRuntimeError {
+		os.Exit(70)
+	}
 }

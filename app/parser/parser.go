@@ -25,12 +25,38 @@ func NewParseError(t *token.Token, message string) *ParseError {
 	return &ParseError{}
 }
 
-func (p *Parser) Parse() ast.Expr {
+func (p *Parser) ParseExpression() ast.Expr {
 	expr, parseErr := p.expression()
 	if parseErr != nil {
 		return nil
 	}
 	return expr
+}
+
+func (p *Parser) ParseProgram() []ast.Stmt {
+	statements := []ast.Stmt{}
+	for !p.isAtEnd() {
+		s, parseErr := p.statement()
+		if parseErr != nil {
+			return nil
+		}
+		statements = append(statements, s)
+	}
+	return statements
+}
+
+func (p *Parser) statement() (ast.Stmt, *ParseError) {
+	p.match(token.PRINT)
+	return p.printStatement()
+}
+
+func (p *Parser) printStatement() (ast.Stmt, *ParseError) {
+	expression, parseErr := p.expression()
+	if parseErr != nil {
+		return nil, parseErr
+	}
+	p.consume(token.SEMICOLON, "Expect ';' after value.")
+	return ast.NewPrintStmt(expression), nil
 }
 
 func (p *Parser) expression() (ast.Expr, *ParseError) {
