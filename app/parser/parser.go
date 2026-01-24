@@ -46,8 +46,10 @@ func (p *Parser) ParseProgram() []ast.Stmt {
 }
 
 func (p *Parser) statement() (ast.Stmt, *ParseError) {
-	p.match(token.PRINT)
-	return p.printStatement()
+	if p.match(token.PRINT) {
+		return p.printStatement()
+	}
+	return p.expressionStatement()
 }
 
 func (p *Parser) printStatement() (ast.Stmt, *ParseError) {
@@ -57,6 +59,15 @@ func (p *Parser) printStatement() (ast.Stmt, *ParseError) {
 	}
 	p.consume(token.SEMICOLON, "Expect ';' after value.")
 	return ast.NewPrintStmt(expression), nil
+}
+
+func (p *Parser) expressionStatement() (ast.Stmt, *ParseError) {
+	expression, parseErr := p.expression()
+	if parseErr != nil {
+		return nil, parseErr
+	}
+	p.consume(token.SEMICOLON, "Expect ';' after value.")
+	return ast.NewExpressionStmt(expression), nil
 }
 
 func (p *Parser) expression() (ast.Expr, *ParseError) {

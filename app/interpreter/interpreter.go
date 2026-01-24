@@ -35,19 +35,35 @@ var numberOnlyOperators = map[token.TokenType]struct{}{
 
 func (i *Interpreter) Interpret(statements []ast.Stmt) {
 	for _, statement := range statements {
-		i.execute(statement)
-	}
-}
-
-func (i *Interpreter) execute(statement ast.Stmt) {
-	switch s := statement.(type) {
-	case *ast.PrintStmt:
-		eval, runtimeErr := i.evaluate(s.Expression)
+		runtimeErr := i.execute(statement)
 		if runtimeErr != nil {
 			return
 		}
-		fmt.Println(utils.Stringify(eval))
 	}
+}
+
+func (i *Interpreter) execute(statement ast.Stmt) *RuntimeError {
+	switch s := statement.(type) {
+	case *ast.PrintStmt:
+		return i.executePrintStatement(s)
+	case *ast.ExpressionStmt:
+		return i.executeExpressionStatement(s)
+	}
+	return nil
+}
+
+func (i *Interpreter) executePrintStatement(statement *ast.PrintStmt) *RuntimeError {
+	eval, runtimeErr := i.evaluate(statement.Expression)
+	if runtimeErr != nil {
+		return runtimeErr
+	}
+	fmt.Println(utils.Stringify(eval))
+	return nil
+}
+
+func (i *Interpreter) executeExpressionStatement(statement *ast.ExpressionStmt) *RuntimeError {
+	_, runtimeErr := i.evaluate(statement.Expression)
+	return runtimeErr
 }
 
 func (i *Interpreter) Evaluate(expression ast.Expr) any {

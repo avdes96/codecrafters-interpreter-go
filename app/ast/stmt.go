@@ -13,3 +13,13 @@ func NewPrintStmt(expression Expr) *PrintStmt {
 }
 
 func (p *PrintStmt) stmtNode() {}
+
+type ExpressionStmt struct {
+	Expression Expr
+}
+
+func NewExpressionStmt(expression Expr) *ExpressionStmt {
+	return &ExpressionStmt{Expression: expression}
+}
+
+func (e *ExpressionStmt) stmtNode() {}
