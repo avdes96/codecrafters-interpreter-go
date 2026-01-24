@@ -10,10 +10,14 @@ import (
 	"github.com/codecrafters-io/interpreter-starter-go/app/utils"
 )
 
-type Interpreter struct{}
+type Interpreter struct {
+	env environment
+}
 
 func NewInterpreter() *Interpreter {
-	return &Interpreter{}
+	return &Interpreter{
+		env: *NewBaseEnviroment(),
+	}
 }
 
 type RuntimeError struct{}
@@ -48,6 +52,8 @@ func (i *Interpreter) execute(statement ast.Stmt) *RuntimeError {
 		return i.executePrintStatement(s)
 	case *ast.ExpressionStmt:
 		return i.executeExpressionStatement(s)
+	case *ast.VarStmt:
+		return i.executeVarStatement(s)
 	}
 	return nil
 }
@@ -64,6 +70,19 @@ func (i *Interpreter) executePrintStatement(statement *ast.PrintStmt) *RuntimeEr
 func (i *Interpreter) executeExpressionStatement(statement *ast.ExpressionStmt) *RuntimeError {
 	_, runtimeErr := i.evaluate(statement.Expression)
 	return runtimeErr
+}
+
+func (i *Interpreter) executeVarStatement(statement *ast.VarStmt) *RuntimeError {
+	var value any = nil
+	var runtimeErr *RuntimeError = nil
+	if statement.Initialiser != nil {
+		value, runtimeErr = i.evaluate(statement.Initialiser)
+		if runtimeErr != nil {
+			return runtimeErr
+		}
+	}
+	i.env.define(statement.Name.Lexeme, value)
+	return nil
 }
 
 func (i *Interpreter) Evaluate(expression ast.Expr) any {
@@ -84,6 +103,9 @@ func (i *Interpreter) evaluate(expression ast.Expr) (any, *RuntimeError) {
 		return e.Value, nil
 	case *ast.Grouping:
 		return i.evaluate(e.Expression)
+	case *ast.Variable:
+		return i.env.get(e.Name)
+
 	}
 	fmt.Fprintf(os.Stderr, "Unexpected type: %T\n", expression)
 	os.Exit(1)

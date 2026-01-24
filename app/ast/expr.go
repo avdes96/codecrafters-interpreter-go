@@ -82,3 +82,13 @@ func (g *Grouping) exprNode() {}
 func NewGrouping(expression Expr) *Grouping {
 	return &Grouping{Expression: expression}
 }
+
+type Variable struct {
+	Name *token.Token
+}
+
+func (v *Variable) exprNode() {}
+
+func NewVariable(name *token.Token) *Variable {
+	return &Variable{Name: name}
+}

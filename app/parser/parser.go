@@ -36,13 +36,46 @@ func (p *Parser) ParseExpression() ast.Expr {
 func (p *Parser) ParseProgram() []ast.Stmt {
 	statements := []ast.Stmt{}
 	for !p.isAtEnd() {
-		s, parseErr := p.statement()
+		s, parseErr := p.declaration()
 		if parseErr != nil {
 			return nil
 		}
 		statements = append(statements, s)
 	}
 	return statements
+}
+
+func (p *Parser) declaration() (ast.Stmt, *ParseError) {
+	if p.match(token.VAR) {
+		varDec, parseErr := p.varDeclaration()
+		if parseErr != nil {
+			p.synchronise()
+			return nil, parseErr
+		}
+		return varDec, nil
+	}
+	statement, parseErr := p.statement()
+	if parseErr != nil {
+		p.synchronise()
+		return nil, parseErr
+	}
+	return statement, nil
+}
+
+func (p *Parser) varDeclaration() (ast.Stmt, *ParseError) {
+	name, parseErr := p.consume(token.IDENTIFIER, "Expect variable name.")
+	if parseErr != nil {
+		return nil, parseErr
+	}
+	var initialiser ast.Expr = nil
+	if p.match(token.EQUAL) {
+		initialiser, parseErr = p.expression()
+		if parseErr != nil {
+			return nil, parseErr
+		}
+	}
+	p.consume(token.SEMICOLON, "Expect ';' after variable declaration.")
+	return ast.NewVarStmt(name, initialiser), nil
 }
 
 func (p *Parser) statement() (ast.Stmt, *ParseError) {
@@ -168,8 +201,35 @@ func (p *Parser) primary() (ast.Expr, *ParseError) {
 			return nil, parseErr
 		}
 		return ast.NewGrouping(expr), nil
+	} else if p.match(token.IDENTIFIER) {
+		return ast.NewVariable(p.previous()), nil
 	}
+
 	return nil, NewParseError(p.peek(), "Expect expression.")
+}
+
+var statementBoundaryTokens = map[token.TokenType]struct{}{
+	token.CLASS:  {},
+	token.FUN:    {},
+	token.VAR:    {},
+	token.FOR:    {},
+	token.IF:     {},
+	token.WHILE:  {},
+	token.PRINT:  {},
+	token.RETURN: {},
+}
+
+func (p *Parser) synchronise() {
+	p.advance()
+	for !p.isAtEnd() {
+		if p.previous().Type == token.SEMICOLON {
+			return
+		}
+		if _, ok := statementBoundaryTokens[p.peek().Type]; ok {
+			return
+		}
+		p.advance()
+	}
 }
 
 func (p *Parser) match(tokenTypes ...token.TokenType) bool {
