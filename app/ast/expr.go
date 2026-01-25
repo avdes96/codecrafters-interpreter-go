@@ -92,3 +92,17 @@ func (v *Variable) exprNode() {}
 func NewVariable(name *token.Token) *Variable {
 	return &Variable{Name: name}
 }
+
+type Assign struct {
+	Name       *token.Token
+	Expression Expr
+}
+
+func (a *Assign) exprNode() {}
+
+func NewAssign(name *token.Token, expression Expr) *Assign {
+	return &Assign{
+		Name:       name,
+		Expression: expression,
+	}
+}

@@ -105,7 +105,16 @@ func (i *Interpreter) evaluate(expression ast.Expr) (any, *RuntimeError) {
 		return i.evaluate(e.Expression)
 	case *ast.Variable:
 		return i.env.get(e.Name)
-
+	case *ast.Assign:
+		value, runtimeErr := i.evaluate(e.Expression)
+		if runtimeErr != nil {
+			return nil, runtimeErr
+		}
+		runtimeErr = i.env.assign(e.Name, value)
+		if runtimeErr != nil {
+			return nil, runtimeErr
+		}
+		return value, nil
 	}
 	fmt.Fprintf(os.Stderr, "Unexpected type: %T\n", expression)
 	os.Exit(1)

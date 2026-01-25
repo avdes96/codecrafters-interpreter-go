@@ -24,5 +24,13 @@ func (e *environment) get(name *token.Token) (any, *RuntimeError) {
 	if value, ok := e.values[name.Lexeme]; ok {
 		return value, nil
 	}
-	return nil, NewRuntimeError(name, fmt.Sprintf("Undefined variable %s.", name.Lexeme))
+	return nil, NewRuntimeError(name, fmt.Sprintf("Undefined variable '%s'.", name.Lexeme))
+}
+
+func (e *environment) assign(name *token.Token, value any) *RuntimeError {
+	if _, ok := e.values[name.Lexeme]; !ok {
+		NewRuntimeError(name, fmt.Sprintf("Undefined variable '%s'.", name.Lexeme))
+	}
+	e.values[name.Lexeme] = value
+	return nil
 }

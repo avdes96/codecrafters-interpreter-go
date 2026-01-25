@@ -104,7 +104,27 @@ func (p *Parser) expressionStatement() (ast.Stmt, *ParseError) {
 }
 
 func (p *Parser) expression() (ast.Expr, *ParseError) {
-	return p.equality()
+	return p.assignment()
+}
+
+func (p *Parser) assignment() (ast.Expr, *ParseError) {
+	expr, parseErr := p.equality()
+	if parseErr != nil {
+		return nil, parseErr
+	}
+	if p.match(token.EQUAL) {
+		equals := p.previous()
+		value, parseErr := p.assignment()
+		if parseErr != nil {
+			return nil, parseErr
+		}
+		if v, ok := expr.(*ast.Variable); ok {
+			return ast.NewAssign(v.Name, value), nil
+		}
+		errs.ErrorAtToken(equals, "Invalid assignment target.")
+		return nil, nil
+	}
+	return expr, nil
 }
 
 func (p *Parser) equality() (ast.Expr, *ParseError) {
