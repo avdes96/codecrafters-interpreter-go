@@ -82,6 +82,13 @@ func (p *Parser) statement() (ast.Stmt, *ParseError) {
 	if p.match(token.PRINT) {
 		return p.printStatement()
 	}
+	if p.match(token.LEFT_BRACE) {
+		stmts, parseErr := p.block()
+		if parseErr != nil {
+			return nil, parseErr
+		}
+		return ast.NewBlockStmt(stmts), nil
+	}
 	return p.expressionStatement()
 }
 
@@ -101,6 +108,19 @@ func (p *Parser) expressionStatement() (ast.Stmt, *ParseError) {
 	}
 	p.consume(token.SEMICOLON, "Expect ';' after value.")
 	return ast.NewExpressionStmt(expression), nil
+}
+
+func (p *Parser) block() ([]ast.Stmt, *ParseError) {
+	stmts := []ast.Stmt{}
+	for !p.check(token.RIGHT_BRACE) && !p.isAtEnd() {
+		stmt, parseErr := p.declaration()
+		if parseErr != nil {
+			return nil, parseErr
+		}
+		stmts = append(stmts, stmt)
+	}
+	p.consume(token.RIGHT_BRACE, "Expect '}' after block.")
+	return stmts, nil
 }
 
 func (p *Parser) expression() (ast.Expr, *ParseError) {

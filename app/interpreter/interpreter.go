@@ -54,6 +54,8 @@ func (i *Interpreter) execute(statement ast.Stmt) *RuntimeError {
 		return i.executeExpressionStatement(s)
 	case *ast.VarStmt:
 		return i.executeVarStatement(s)
+	case *ast.BlockStmt:
+		return i.executeBlockStatement(s)
 	}
 	return nil
 }
@@ -82,6 +84,15 @@ func (i *Interpreter) executeVarStatement(statement *ast.VarStmt) *RuntimeError 
 		}
 	}
 	i.env.define(statement.Name.Lexeme, value)
+	return nil
+}
+
+func (i *Interpreter) executeBlockStatement(statement *ast.BlockStmt) *RuntimeError {
+	for _, stmt := range statement.Stmts {
+		if runtimeErr := i.execute(stmt); runtimeErr != nil {
+			return runtimeErr
+		}
+	}
 	return nil
 }
 

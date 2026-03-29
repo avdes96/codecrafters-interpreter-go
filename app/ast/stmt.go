@@ -38,4 +38,14 @@ func NewVarStmt(name *token.Token, initialiser Expr) *VarStmt {
 	}
 }
 
-func (e *VarStmt) stmtNode() {}
+func (v *VarStmt) stmtNode() {}
+
+type BlockStmt struct {
+	Stmts []Stmt
+}
+
+func NewBlockStmt(stmts []Stmt) *BlockStmt {
+	return &BlockStmt{Stmts: stmts}
+}
+
+func (b *BlockStmt) stmtNode() {}
