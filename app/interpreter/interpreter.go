@@ -11,12 +11,12 @@ import (
 )
 
 type Interpreter struct {
-	env environment
+	env *environment
 }
 
 func NewInterpreter() *Interpreter {
 	return &Interpreter{
-		env: *NewBaseEnviroment(),
+		env: NewBaseEnviroment(),
 	}
 }
 
@@ -88,6 +88,9 @@ func (i *Interpreter) executeVarStatement(statement *ast.VarStmt) *RuntimeError 
 }
 
 func (i *Interpreter) executeBlockStatement(statement *ast.BlockStmt) *RuntimeError {
+	prev := i.env
+	defer func() { i.env = prev }()
+	i.env = NewSubEnvironment(prev)
 	for _, stmt := range statement.Stmts {
 		if runtimeErr := i.execute(stmt); runtimeErr != nil {
 			return runtimeErr
