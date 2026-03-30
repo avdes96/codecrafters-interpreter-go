@@ -106,3 +106,19 @@ func NewAssign(name *token.Token, expression Expr) *Assign {
 		Expression: expression,
 	}
 }
+
+type Logical struct {
+	Left     Expr
+	Operator *token.Token
+	Right    Expr
+}
+
+func (l *Logical) exprNode() {}
+
+func NewLogical(left Expr, operator *token.Token, right Expr) *Logical {
+	return &Logical{
+		Left:     left,
+		Operator: operator,
+		Right:    right,
+	}
+}

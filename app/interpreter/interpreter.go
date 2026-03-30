@@ -129,6 +129,8 @@ func (i *Interpreter) evaluate(expression ast.Expr) (any, *RuntimeError) {
 		return i.evaluateBinary(e)
 	case *ast.Unary:
 		return i.evaluateUnary(e)
+	case *ast.Logical:
+		return i.evaluateLogical(e)
 	case *ast.Literal:
 		return e.Value, nil
 	case *ast.Grouping:
@@ -219,6 +221,17 @@ func (i *Interpreter) evaluateBinary(binary *ast.Binary) (any, *RuntimeError) {
 		return !isEqual(left, right), nil
 	}
 	return nil, nil
+}
+
+func (i *Interpreter) evaluateLogical(logical *ast.Logical) (any, *RuntimeError) {
+	left, runtimeErr := i.evaluate(logical.Left)
+	if runtimeErr != nil {
+		return nil, runtimeErr
+	}
+	if isTruthy(left) {
+		return left, nil
+	}
+	return i.evaluate(logical.Right)
 }
 
 func isFloat64(val any) bool {
