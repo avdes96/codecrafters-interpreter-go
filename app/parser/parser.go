@@ -62,7 +62,7 @@ func (p *Parser) declaration() (ast.Stmt, *ParseError) {
 	return statement, nil
 }
 
-func (p *Parser) varDeclaration() (ast.Stmt, *ParseError) {
+func (p *Parser) varDeclaration() (*ast.VarStmt, *ParseError) {
 	name, parseErr := p.consume(token.IDENTIFIER, "Expect variable name.")
 	if parseErr != nil {
 		return nil, parseErr
@@ -92,7 +92,7 @@ func (p *Parser) statement() (ast.Stmt, *ParseError) {
 	return p.expressionStatement()
 }
 
-func (p *Parser) printStatement() (ast.Stmt, *ParseError) {
+func (p *Parser) printStatement() (*ast.PrintStmt, *ParseError) {
 	expression, parseErr := p.expression()
 	if parseErr != nil {
 		return nil, parseErr
@@ -101,7 +101,7 @@ func (p *Parser) printStatement() (ast.Stmt, *ParseError) {
 	return ast.NewPrintStmt(expression), nil
 }
 
-func (p *Parser) expressionStatement() (ast.Stmt, *ParseError) {
+func (p *Parser) expressionStatement() (*ast.ExpressionStmt, *ParseError) {
 	expression, parseErr := p.expression()
 	if parseErr != nil {
 		return nil, parseErr
