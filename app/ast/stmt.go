@@ -49,3 +49,19 @@ func NewBlockStmt(stmts []Stmt) *BlockStmt {
 }
 
 func (b *BlockStmt) stmtNode() {}
+
+type IfStmt struct {
+	Condition  Expr
+	ThenBranch Stmt
+	ElseBranch Stmt
+}
+
+func NewIfStmt(condtion Expr, thenBranch Stmt, elseBranch Stmt) *IfStmt {
+	return &IfStmt{
+		Condition:  condtion,
+		ThenBranch: thenBranch,
+		ElseBranch: elseBranch,
+	}
+}
+
+func (i *IfStmt) stmtNode() {}

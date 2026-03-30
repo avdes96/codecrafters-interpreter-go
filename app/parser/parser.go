@@ -79,6 +79,9 @@ func (p *Parser) varDeclaration() (*ast.VarStmt, *ParseError) {
 }
 
 func (p *Parser) statement() (ast.Stmt, *ParseError) {
+	if p.match(token.IF) {
+		return p.ifStatement()
+	}
 	if p.match(token.PRINT) {
 		return p.printStatement()
 	}
@@ -90,6 +93,32 @@ func (p *Parser) statement() (ast.Stmt, *ParseError) {
 		return ast.NewBlockStmt(stmts), nil
 	}
 	return p.expressionStatement()
+}
+
+func (p *Parser) ifStatement() (*ast.IfStmt, *ParseError) {
+	if _, parseErr := p.consume(token.LEFT_PAREN, "Expect '(' after 'if'."); parseErr != nil {
+		return nil, parseErr
+	}
+	condition, parseErr := p.expression()
+	if parseErr != nil {
+		return nil, parseErr
+	}
+	if _, parseErr := p.consume(token.RIGHT_PAREN, "Expect ')' after if condition."); parseErr != nil {
+		return nil, parseErr
+	}
+
+	thenBranch, parseErr := p.statement()
+	if parseErr != nil {
+		return nil, parseErr
+	}
+	var elseBranch ast.Stmt
+	if p.match(token.ELSE) {
+		elseBranch, parseErr = p.statement()
+		if parseErr != nil {
+			return nil, parseErr
+		}
+	}
+	return ast.NewIfStmt(condition, thenBranch, elseBranch), nil
 }
 
 func (p *Parser) printStatement() (*ast.PrintStmt, *ParseError) {
