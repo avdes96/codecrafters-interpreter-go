@@ -228,8 +228,14 @@ func (i *Interpreter) evaluateLogical(logical *ast.Logical) (any, *RuntimeError)
 	if runtimeErr != nil {
 		return nil, runtimeErr
 	}
-	if isTruthy(left) {
-		return left, nil
+	if logical.Operator.Type == token.OR {
+		if isTruthy(left) {
+			return left, nil
+		}
+	} else {
+		if !isTruthy(left) {
+			return left, nil
+		}
 	}
 	return i.evaluate(logical.Right)
 }

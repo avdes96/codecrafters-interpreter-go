@@ -177,11 +177,27 @@ func (p *Parser) assignment() (ast.Expr, *ParseError) {
 }
 
 func (p *Parser) or() (ast.Expr, *ParseError) {
-	expr, parseErr := p.equality()
+	expr, parseErr := p.and()
 	if parseErr != nil {
 		return nil, parseErr
 	}
 	for p.match(token.OR) {
+		operator := p.previous()
+		right, parseErr := p.and()
+		if parseErr != nil {
+			return nil, parseErr
+		}
+		expr = ast.NewLogical(expr, operator, right)
+	}
+	return expr, nil
+}
+
+func (p *Parser) and() (ast.Expr, *ParseError) {
+	expr, parseErr := p.equality()
+	if parseErr != nil {
+		return nil, parseErr
+	}
+	for p.match(token.AND) {
 		operator := p.previous()
 		right, parseErr := p.equality()
 		if parseErr != nil {
