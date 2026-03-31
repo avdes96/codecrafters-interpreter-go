@@ -79,6 +79,9 @@ func (p *Parser) varDeclaration() (*ast.VarStmt, *ParseError) {
 }
 
 func (p *Parser) statement() (ast.Stmt, *ParseError) {
+	if p.match(token.FOR) {
+		return p.forStatement()
+	}
 	if p.match(token.WHILE) {
 		return p.whileStatement()
 	}
@@ -114,6 +117,62 @@ func (p *Parser) whileStatement() (*ast.WhileStmt, *ParseError) {
 		return nil, parseErr
 	}
 	return ast.NewWhileStmt(condition, body), nil
+}
+
+func (p *Parser) forStatement() (ast.Stmt, *ParseError) {
+	if _, parseErr := p.consume(token.LEFT_PAREN, "Expect '(' after 'for'."); parseErr != nil {
+		return nil, parseErr
+	}
+	var initialiser ast.Stmt
+	var parseErr *ParseError
+	if p.match(token.SEMICOLON) {
+		initialiser = nil
+	} else if p.match(token.VAR) {
+		initialiser, parseErr = p.varDeclaration()
+		if parseErr != nil {
+			return nil, parseErr
+		}
+	} else {
+		initialiser, parseErr = p.expressionStatement()
+		if parseErr != nil {
+			return nil, parseErr
+		}
+	}
+	var condition ast.Expr
+	if !p.check(token.SEMICOLON) {
+		condition, parseErr = p.expression()
+		if parseErr != nil {
+			return nil, parseErr
+		}
+	}
+	if _, parseErr := p.consume(token.SEMICOLON, "Expect ';' after loop condition."); parseErr != nil {
+		return nil, parseErr
+	}
+	var increment ast.Expr
+	if !p.check(token.RIGHT_PAREN) {
+		increment, parseErr = p.expression()
+		if parseErr != nil {
+			return nil, parseErr
+		}
+	}
+	if _, parseErr := p.consume(token.RIGHT_PAREN, "Expect ')' after for clauses."); parseErr != nil {
+		return nil, parseErr
+	}
+	body, parseErr := p.statement()
+	if parseErr != nil {
+		return nil, parseErr
+	}
+	if increment != nil {
+		body = ast.NewBlockStmt([]ast.Stmt{body, ast.NewExpressionStmt(increment)})
+	}
+	if condition == nil {
+		condition = ast.NewLiteral(true)
+	}
+	body = ast.NewWhileStmt(condition, body)
+	if initialiser != nil {
+		body = ast.NewBlockStmt([]ast.Stmt{initialiser, body})
+	}
+	return body, nil
 }
 
 func (p *Parser) ifStatement() (*ast.IfStmt, *ParseError) {
