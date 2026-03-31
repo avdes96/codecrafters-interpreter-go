@@ -65,3 +65,17 @@ func NewIfStmt(condtion Expr, thenBranch Stmt, elseBranch Stmt) *IfStmt {
 }
 
 func (i *IfStmt) stmtNode() {}
+
+type WhileStmt struct {
+	Condition Expr
+	Body      Stmt
+}
+
+func NewWhileStmt(condtion Expr, body Stmt) *WhileStmt {
+	return &WhileStmt{
+		Condition: condtion,
+		Body:      body,
+	}
+}
+
+func (i *WhileStmt) stmtNode() {}

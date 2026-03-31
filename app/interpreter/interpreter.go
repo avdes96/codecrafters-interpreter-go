@@ -58,6 +58,8 @@ func (i *Interpreter) execute(statement ast.Stmt) *RuntimeError {
 		return i.executeBlockStatement(s)
 	case *ast.IfStmt:
 		return i.executeIfStatement(s)
+	case *ast.WhileStmt:
+		return i.executeWhileStatement(s)
 	}
 	return nil
 }
@@ -111,6 +113,22 @@ func (i *Interpreter) executeIfStatement(statement *ast.IfStmt) *RuntimeError {
 	}
 	if statement.ElseBranch != nil {
 		return i.execute(statement.ElseBranch)
+	}
+	return nil
+}
+
+func (i *Interpreter) executeWhileStatement(statement *ast.WhileStmt) *RuntimeError {
+	for {
+		val, runtimeErr := i.evaluate(statement.Condition)
+		if runtimeErr != nil {
+			return runtimeErr
+		}
+		if !isTruthy(val) {
+			break
+		}
+		if runtimeErr = i.execute(statement.Body); runtimeErr != nil {
+			return runtimeErr
+		}
 	}
 	return nil
 }

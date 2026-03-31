@@ -79,6 +79,9 @@ func (p *Parser) varDeclaration() (*ast.VarStmt, *ParseError) {
 }
 
 func (p *Parser) statement() (ast.Stmt, *ParseError) {
+	if p.match(token.WHILE) {
+		return p.whileStatement()
+	}
 	if p.match(token.IF) {
 		return p.ifStatement()
 	}
@@ -93,6 +96,24 @@ func (p *Parser) statement() (ast.Stmt, *ParseError) {
 		return ast.NewBlockStmt(stmts), nil
 	}
 	return p.expressionStatement()
+}
+
+func (p *Parser) whileStatement() (*ast.WhileStmt, *ParseError) {
+	if _, parseErr := p.consume(token.LEFT_PAREN, "Expect '(' after 'while'."); parseErr != nil {
+		return nil, parseErr
+	}
+	condition, parseErr := p.expression()
+	if parseErr != nil {
+		return nil, parseErr
+	}
+	if _, parseErr := p.consume(token.RIGHT_PAREN, "Expect ')' after while condition."); parseErr != nil {
+		return nil, parseErr
+	}
+	body, parseErr := p.statement()
+	if parseErr != nil {
+		return nil, parseErr
+	}
+	return ast.NewWhileStmt(condition, body), nil
 }
 
 func (p *Parser) ifStatement() (*ast.IfStmt, *ParseError) {
